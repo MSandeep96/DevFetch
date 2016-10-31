@@ -1,4 +1,4 @@
-package com.harambe.devfetch;
+package com.harambe.devfetch.mainActivity_MVP.Fragment;
 
 
 import android.os.Bundle;
@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.harambe.devfetch.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RantsViewFragment extends Fragment {
+public class RantsViewFragment extends Fragment implements RantsView {
 
 
     public RantsViewFragment() {
