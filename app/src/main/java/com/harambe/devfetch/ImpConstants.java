@@ -6,7 +6,8 @@ package com.harambe.devfetch;
 
 public interface ImpConstants {
     int PAGIN_LIMIT = 20;
-    int DEFAULT_TIME_DELAY=180000;
+    // TODO: 01-11-2016 Make it 180000
+    int DEFAULT_TIME_DELAY=20000;
 
     //Prefs accessors
     String TIME_DELAY="DLSJF";

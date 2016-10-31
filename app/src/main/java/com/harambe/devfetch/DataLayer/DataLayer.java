@@ -54,7 +54,7 @@ public class DataLayer implements DataLayerInterface,ImpConstants {
 
     @Override
     public void getPaginatedTracks(int presentCount, final MainPresenter mainPresenter) {
-        Call<DevRantResponse> mResp=mDevRantApi.getRants(0,PAGIN_LIMIT);
+        Call<DevRantResponse> mResp=mDevRantApi.getRants(presentCount,PAGIN_LIMIT);
         mResp.enqueue(new Callback<DevRantResponse>() {
             @Override
             public void onResponse(Call<DevRantResponse> call, Response<DevRantResponse> response) {

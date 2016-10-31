@@ -15,6 +15,7 @@ import com.harambe.devfetch.ImpConstants;
 import com.harambe.devfetch.NetworkPojos.Rants;
 import com.harambe.devfetch.R;
 import com.harambe.devfetch.RantsAdapter;
+import com.harambe.devfetch.RecyclerViewDecorations.TracksItemDecoration;
 import com.harambe.devfetch.mainActivity_MVP.MainPresenterInterface;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
     //flags for maintaining pagination
     boolean isScrollable= true;
     boolean isFetching = false;
+    boolean gotFirstResp=false;
 
     //keeps count of present objects for pagination
     int presentCount=0;
@@ -48,6 +50,7 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
     //for real time updation
     private Handler mHandler;
     private Runnable mFetchThread;
+    long delayInMills = DEFAULT_TIME_DELAY;
 
     public RantsViewFragment() {
         // Required empty public constructor
@@ -91,8 +94,10 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
 
         mLLM = new LinearLayoutManager(getContext());
         mRecyView.setLayoutManager(mLLM);
+        mRecyView.addItemDecoration(new TracksItemDecoration(getContext()));
         mAdapter = new RantsAdapter();
         mRecyView.setAdapter(mAdapter);
+        mRecyView.addOnScrollListener(mScrollListener);
         mHandler = new Handler();
 
         //fetch items
@@ -104,19 +109,16 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
      * A handler to keep fetching items in a certain interval
      */
     private void startFetchingItems() {
-        /*
         mFetchThread = new Runnable() {
             @Override
             public void run() {
 
                 mPresenter.getHomeFeed();
                 //fetches every
-                mHandler.postDelayed(mFetchThread, Prefs.getInt(TIME_DELAY,DEFAULT_TIME_DELAY));
+                mHandler.postDelayed(mFetchThread,delayInMills);
             }
         };
         mFetchThread.run();
-        */
-        mPresenter.getHomeFeed();
     }
 
 
@@ -129,6 +131,10 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
         if(mProgBar.isShown()){
             mProgBar.setVisibility(View.INVISIBLE);
         }
+        if(!gotFirstResp){
+            presentCount+=mRants.size();
+            gotFirstResp=true;
+        }
         mAdapter.addItems(mRants);
     }
 
@@ -138,6 +144,7 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
      */
     @Override
     public void gotPaginatedTracks(ArrayList<Rants> mRants) {
+        isFetching=false;
         if(mRants.size()< PAGIN_LIMIT){
             isScrollable=false;
             if(mRants.size()==0)
