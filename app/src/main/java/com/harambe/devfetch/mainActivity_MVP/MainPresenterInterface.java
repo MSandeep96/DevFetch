@@ -1,5 +1,7 @@
 package com.harambe.devfetch.mainActivity_MVP;
 
+import android.os.Parcelable;
+
 import com.harambe.devfetch.NetworkPojos.Rants;
 import com.harambe.devfetch.mainActivity_MVP.Fragment.RantsView;
 
@@ -19,4 +21,10 @@ public interface MainPresenterInterface {
     void getPaginatedTracks(int presentCount);
 
     void gotPaginatedTracks(ArrayList<Rants> mRants);
+
+    void notifyChange(int size);
+
+    ArrayList<? extends Parcelable> getFeedForBundle();
+
+    void setHomeFeedFromBundle(ArrayList<Rants> parcelableArrayList);
 }

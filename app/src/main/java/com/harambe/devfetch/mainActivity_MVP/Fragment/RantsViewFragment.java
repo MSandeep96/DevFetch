@@ -3,6 +3,7 @@ package com.harambe.devfetch.mainActivity_MVP.Fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import com.harambe.devfetch.R;
 import com.harambe.devfetch.RantsAdapter;
 import com.harambe.devfetch.RecyclerViewDecorations.TracksItemDecoration;
 import com.harambe.devfetch.mainActivity_MVP.MainPresenterInterface;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.util.ArrayList;
 
@@ -50,7 +52,7 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
     //for real time updation
     private Handler mHandler;
     private Runnable mFetchThread;
-    long delayInMills = DEFAULT_TIME_DELAY;
+    long delayInMills;
 
     public RantsViewFragment() {
         // Required empty public constructor
@@ -95,13 +97,17 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
         mLLM = new LinearLayoutManager(getContext());
         mRecyView.setLayoutManager(mLLM);
         mRecyView.addItemDecoration(new TracksItemDecoration(getContext()));
-        mAdapter = new RantsAdapter();
+        mAdapter = new RantsAdapter(mPresenter);
         mRecyView.setAdapter(mAdapter);
         mRecyView.addOnScrollListener(mScrollListener);
         mHandler = new Handler();
-
         //fetch items
-        startFetchingItems();
+        delayInMills= Prefs.getLong(TIME_DELAY,DEFAULT_TIME_DELAY);
+        if(savedInstanceState!=null){
+            mProgBar.setVisibility(View.GONE);
+        }else{
+            startFetchingItems();
+        }
         return mView;
     }
 
@@ -152,5 +158,21 @@ public class RantsViewFragment extends Fragment implements RantsView,ImpConstant
         }
         presentCount+=mRants.size();
         mAdapter.addPaginItems(mRants);
+    }
+
+    @Override
+    public ArrayList<? extends Parcelable> getFeedForBundle() {
+        mHandler.removeCallbacks(mFetchThread);
+        return mAdapter.getFeedForBundle();
+    }
+
+    @Override
+    public void setFeedFromBundle(ArrayList<Rants> parcelableArrayList) {
+        if(!gotFirstResp){
+            presentCount+=parcelableArrayList.size();
+            gotFirstResp=true;
+        }
+        mAdapter.setFeedFromBundle(parcelableArrayList);
+        startFetchingItems();
     }
 }

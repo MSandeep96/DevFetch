@@ -5,4 +5,5 @@ package com.harambe.devfetch.mainActivity_MVP;
  */
 
 public interface MainView {
+    void notifyChange(int size);
 }

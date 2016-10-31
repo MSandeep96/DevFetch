@@ -1,5 +1,6 @@
 package com.harambe.devfetch;
 
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.harambe.devfetch.NetworkPojos.Rants;
+import com.harambe.devfetch.mainActivity_MVP.MainPresenterInterface;
 
 import java.util.ArrayList;
 
@@ -26,6 +28,8 @@ public class RantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final int TRACK_VIEW = 6;
     public ArrayList<Rants> mRants;
 
+    MainPresenterInterface mPresenter;
+
     //tracks if pagination is enable and adds prog bar at bottom accordingly
     boolean isPagin = true;
 
@@ -33,8 +37,8 @@ public class RantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         isPagin = pagin;
     }
 
-    public RantsAdapter() {
-
+    public RantsAdapter(MainPresenterInterface mPresenter) {
+        this.mPresenter=mPresenter;
     }
 
     @Override
@@ -112,11 +116,27 @@ public class RantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
         //case 2
         ArrayList<Rants> mTemp = new ArrayList<>(mRants.subList(0, rants.size()));
-        mTemp.removeAll(rants);
-        if (mTemp.size() != 0) {
-            mRants.addAll(0, mTemp);
-            notifyItemRangeInserted(0, mTemp.size());
+        mTemp=findNew(mTemp,rants);
+        mRants.addAll(0,mTemp);
+        mPresenter.notifyChange(mTemp.size());
+    }
+
+    /**
+     * Checks if any new rants are present
+     * @param mTemp Contains about the same size of rants as the rants just fetched
+     * @param rants Rants just fetched
+     * @return New rants only, empty arraylist if none
+     */
+    private ArrayList<Rants> findNew(ArrayList<Rants> mTemp, ArrayList<Rants> rants) {
+        ArrayList<Rants> mNewRants=new ArrayList<>();
+        for(int i=0;i<mTemp.size();i++){
+            if(mTemp.get(i).getId()==rants.get(i).getId()){
+                break;
+            }else{
+                mNewRants.add(rants.get(i));
+            }
         }
+        return mNewRants;
     }
 
     /**
@@ -128,6 +148,15 @@ public class RantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         int prevSize = mRants.size();
         mRants.addAll(rants);
         notifyItemRangeInserted(prevSize, rants.size());
+    }
+
+    public ArrayList<? extends Parcelable> getFeedForBundle() {
+        return mRants;
+    }
+
+    public void setFeedFromBundle(ArrayList<Rants> parcelableArrayList) {
+        mRants=parcelableArrayList;
+        notifyItemRangeInserted(0,parcelableArrayList.size());
     }
 
     public static class RantsViewHolder extends RecyclerView.ViewHolder {
