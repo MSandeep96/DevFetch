@@ -7,16 +7,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.harambe.devfetch.R;
+import com.harambe.devfetch.mainActivity_MVP.Fragment.CommunicatorInterface;
 import com.harambe.devfetch.mainActivity_MVP.Fragment.RantsViewFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements MainView{
+public class MainActivity extends AppCompatActivity implements MainView,CommunicatorInterface {
+
+    private MainPresenterInterface mPresenter;
 
     @OnClick(R.id.fab)
-    void onFabClicked(){
+    void onFabClicked() {
 
     }
 
@@ -31,14 +34,15 @@ public class MainActivity extends AppCompatActivity implements MainView{
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        mFrag=new RantsViewFragment();
+        mFrag = new RantsViewFragment();
         showRantsView();
+        mPresenter = new MainPresenter(this);
     }
 
     private void showRantsView() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.cm_fl_frags_holder,mFrag)
+                .replace(R.id.cm_fl_frags_holder, mFrag)
                 .commit();
     }
 
@@ -58,5 +62,10 @@ public class MainActivity extends AppCompatActivity implements MainView{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public MainPresenterInterface getPresenter() {
+        return mPresenter;
     }
 }

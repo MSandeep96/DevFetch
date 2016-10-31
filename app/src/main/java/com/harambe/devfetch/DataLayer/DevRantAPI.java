@@ -1,5 +1,8 @@
 package com.harambe.devfetch.DataLayer;
 
+import com.harambe.devfetch.NetworkPojos.DevRantResponse;
+
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
@@ -9,9 +12,9 @@ import retrofit2.http.Query;
 
 public interface DevRantAPI {
 
-    @GET("/rants?app=3&limit=30")
-    void getRants(@Query("skip") int no);
+    @GET("rants?app=3")
+    Call<DevRantResponse> getRants(@Query("skip") int no,@Query("limit") int limit);
 
-    @GET("/search?app=3")
-    void getSearchResults(@Query("term") String term);
+    @GET("search?app=3")
+    Call<DevRantResponse> getSearchResults(@Query("term") String term);
 }
